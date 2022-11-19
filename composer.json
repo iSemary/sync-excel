@@ -1,0 +1,19 @@
+{
+    "name": "isemary/sync-excel",
+    "description": "Syncing excel file sheet to any table by matching sheet columns to database table columns with an easy user interface, build with Javascript, PHP, MySQL.",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Semary\\SyncExcel\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Abdelrahman Samir",
+            "email": "abdelrahmansamirmostafa@gmail.com"
+        }
+    ],
+    "require": {
+        "nuovo/spreadsheet-reader": "^0.5.11"
+    }
+}

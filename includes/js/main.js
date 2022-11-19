@@ -9,10 +9,10 @@ $("#fillLocalhostDB").on("click", function (e) {
   $('input[name="db_username"]').val("root");
 });
 // Call api function
-function callAPI(formID, type) {
+function callAPI(formID, type, btn) {
   $("#connectType").val(type);
   let form = $("#" + formID);
-  let formBtn = $(this);
+  let formBtn = $("#"+btn);
   let formData = new FormData(form[0]);
   let formUrl = form.attr("action");
   $.ajax({
@@ -57,6 +57,8 @@ function callAPI(formID, type) {
         } else {
           $("#dbColumns").prop("disabled", true);
         }
+      } else if (type == "execute") {
+
       }
       $(".form-status").html(
         `<h6 class="text-${
@@ -73,12 +75,12 @@ function callAPI(formID, type) {
 // Connect and Get Tables
 $("#connectDB").on("click", function (e) {
   e.preventDefault();
-  callAPI("connectDBForm", "tables");
+  callAPI("connectDBForm", "tables", "connectDB");
 });
 // Connect and Get Selected Table Columns
 $("#dbTables").on("change", function (e) {
   e.preventDefault();
-  callAPI("connectDBForm", "columns");
+  callAPI("connectDBForm", "columns", "dbTables");
 });
 // Get uploaded excel columns
 $("#importFile").on("click", function (e) {
@@ -98,6 +100,12 @@ $("#drawFlow").on("click", function (e) {
   $("#flowSection").removeClass("d-none");
   drawFlow(dbArr, excelArr);
 });
+// Listen for generated json
+$("#get_data").on("click", function () {
+  $("#syncBtn").prop("disabled", false);
+  $("#matchTag").removeClass("close-tag").addClass("open-tag");
+});
+
 // Draw Flow based on database columns and excel columns
 function drawFlow(db_columns, excel_columns) {
   $(document).ready(function () {
@@ -428,3 +436,9 @@ function drawFlow(db_columns, excel_columns) {
   };
   if (false) console.log("remove lint unused warning", defaultFlowchartData);
 }
+
+// Pass data to execute the cycle in backend side
+$("#syncBtn").on("click", function (e) {
+  e.preventDefault();
+  callAPI("connectDBForm", "execute", "syncBtn");
+});

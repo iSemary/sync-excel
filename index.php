@@ -76,21 +76,22 @@
                 <h3><i class="fas fa-file-excel"></i> Sync Excel</h3>
             </div>
             <div class="card-body">
-                <div>
-                    <div class="">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h4>Phase 1</h4>
-                                <h6><i class="fas fa-plug"></i> Connect to database and select table</h6>
-                            </div>
-                            <div class="col-md-6 text-right">
-                                <button class="btn btn-info" type="button" id="fillLocalhostDB"><i class="fas fa-server"></i> Fill Localhost Database</button>
+                <form method="POST" action="./config/worker.php" id="connectDBForm">
+                    <input type="hidden" name="type" id="connectType" value="">
+                    <div>
+                        <div class="">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h4>Phase 1</h4>
+                                    <h6><i class="fas fa-plug"></i> Connect to database and select table</h6>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <button class="btn btn-info" type="button" id="fillLocalhostDB"><i class="fas fa-server"></i> Fill Localhost Database</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <form method="POST" action="./config/worker.php" id="connectDBForm">
-                        <input type="hidden" name="type" id="connectType" value="">
+
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 <label>Database Host</label>
@@ -121,25 +122,24 @@
                                 </select>
                             </div>
                         </div>
-                    </form>
-                </div>
-                <hr>
-                <div>
-                    <div class="row">
-                        <div class="col-6">
-                            <h4>Phase 2</h4>
-                            <h6><i class="fas fa-code-branch"></i> Match your columns</h6>
-                            <input type="file" class="d-none" id="excelFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="excel_file">
-                        </div>
-                        <div class="col-6">
-
-                        </div>
                     </div>
-                    <div class="d-none" id="flowSection">
-                        <div id="chart_container">
-                            <div class="flowchart-example-container" id="syncExcelDBFlow"></div>
+                    <hr>
+                    <div>
+                        <div class="row">
+                            <div class="col-6">
+                                <h4>Phase 2</h4>
+                                <h6><i class="fas fa-code-branch"></i> Match your columns</h6>
+                                <input type="file" class="d-none" id="excelFile" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" name="excel_file">
+                            </div>
+                            <div class="col-6">
+
+                            </div>
                         </div>
-                        <!-- <div class="draggable_operators">
+                        <div class="d-none" id="flowSection">
+                            <div id="chart_container">
+                                <div class="flowchart-example-container" id="syncExcelDBFlow"></div>
+                            </div>
+                            <!-- <div class="draggable_operators">
                             <div class="draggable_operators_label">
                                 Operators (drag and drop them in the flowchart):
                             </div>
@@ -152,48 +152,48 @@
                                 <div class="draggable_operator" data-nb-inputs="2" data-nb-outputs="2">2 in &amp; 2 out</div>
                             </div>
                         </div> -->
-                        <!-- <button class="btn btn-sm btn-secondary create_operator">Create operator</button> -->
-                        <button class="btn btn-sm btn-secondary delete_selected_button">Delete selected operator / link</button>
-                        <div id="operator_properties" style="display: block;">
-                            <label for="operator_title">Operator's title: </label><input id="operator_title" type="text">
-                        </div>
-                        <!-- <div id="link_properties" style="display: block;">
+                            <!-- <button class="btn btn-sm btn-secondary create_operator" type="button">Create operator</button> -->
+                            <button class="btn btn-sm btn-secondary delete_selected_button" type="button">Delete selected operator / link</button>
+                            <div id="operator_properties" style="display: block;">
+                                <label for="operator_title">Operator's title: </label><input id="operator_title" type="text">
+                            </div>
+                            <!-- <div id="link_properties" style="display: block;">
                             <label for="link_color">Link's color: </label><input id="link_color" type="color">
                         </div> -->
-                        <button class="btn btn-sm btn-secondary get_data" id="get_data">Get data</button>
-                        <button class="btn btn-sm btn-secondary set_data" id="set_data">Set data</button>
-                        <!-- <button class="btn btn-sm btn-secondary " id="save_local">Save to local storage</button>
-                        <button class="btn btn-sm btn-secondary " id="load_local">Load from local storage</button> -->
-                        <div class="mt-2">
-                            <div class="row">
-                                <div class="col-6 form-group">
-                                    <label><i class="fas fa-code"></i> Generated JSON</label>
-                                    <textarea class="form-control w-100" id="flowchart_data" placeholder="Generated data passed to backend side..."></textarea>
-                                </div>
-                                <div class="col-6">
-                                    <small><i class="fas fa-info-circle"></i> Set the inputs empty if you want to push the whole excel file to the table</small>
-                                    <hr>
-                                    <div class="row">
-                                        <div class="col-6 form-group">
-                                            <label>Start from row : </label>
-                                            <input type="number" class="form-control" name="start_row" value="" placeholder="100">
-                                        </div>
-                                        <div class="col-6 form-group">
-                                            <label>End at row : </label>
-                                            <input type="number" class="form-control" name="ebd_row" value="" placeholder="200">
+                            <button class="btn btn-sm btn-secondary set_data" id="set_data" type="button">Set data</button>
+                            <button class="btn btn-sm btn-primary get_data" id="get_data" type="button"><i class="fas fa-code"></i> Export JSON Data</button>
+                            <!-- <button class="btn btn-sm btn-secondary " id="save_local" type="button">Save to local storage</button>
+                        <button class="btn btn-sm btn-secondary " id="load_local" type="button">Load from local storage</button> -->
+                            <div class="mt-2">
+                                <div class="row">
+                                    <div class="col-6 form-group">
+                                        <label><i class="fas fa-code"></i> Generated JSON</label>
+                                        <textarea class="form-control w-100" name="flow_json" id="flowchart_data" placeholder="Generated data passed to backend side..."></textarea>
+                                    </div>
+                                    <div class="col-6">
+                                        <small><i class="fas fa-info-circle"></i> Set the inputs empty if you want to push the whole excel file to the table</small>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-6 form-group">
+                                                <label>Start from row : </label>
+                                                <input type="number" class="form-control" name="start_row" value="" placeholder="100">
+                                            </div>
+                                            <div class="col-6 form-group">
+                                                <label>End at row : </label>
+                                                <input type="number" class="form-control" name="end_row" value="" placeholder="200">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
             </div>
             <div class="card-footer">
                 <div class="form-group">
                     <div class="row">
                         <div class="col-2 text-left">
-                            <button type="button" class="btn btn-success" disabled><i class="fas fa-sync" id="SyncIcon"></i> Sync</button>
+                            <button type="button" class="btn btn-success" id="syncBtn" disabled><i class="fas fa-sync" id="syncIcon"></i> Sync</button>
                         </div>
                         <div class="col-4 text-center">
                             <div class="ready-icons">
@@ -211,12 +211,13 @@
                         <div class="col-6 text-right">
                             <button type="button" class="btn btn-warning" id="connectDB"><i class="fas fa-database"></i> Connect to database</button>
                             <button type="button" class="btn btn-primary" id="importFile"><i class="fas fa-upload"></i> Import Excel</button>
-                            <button type="button" class="btn btn-secondary" id="drawFlow"><i class="fas fa-upload"></i> Draw Flow</button>
+                            <button type="button" class="btn btn-secondary" id="drawFlow"><i class="fas fa-stream"></i> Draw Flow</button>
                             <div class="form-status mt-2"></div>
                         </div>
                     </div>
                 </div>
             </div>
+            </form>
         </div>
     </div>
 

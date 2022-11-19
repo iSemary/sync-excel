@@ -1,0 +1,134 @@
+{
+  "operators": {
+    "operator1": {
+      "top": 170,
+      "left": 240,
+      "properties": {
+        "title": "Excel Columns",
+        "inputs": {},
+        "outputs": {
+          "output_1": {
+            "label": "A1"
+          },
+          "output_2": {
+            "label": "B1"
+          },
+          "output_3": {
+            "label": "C1"
+          },
+          "output_4": {
+            "label": "D1"
+          },
+          "output_5": {
+            "label": "E1"
+          }
+        }
+      }
+    },
+    "operator2": {
+      "top": 20,
+      "left": 700,
+      "properties": {
+        "title": "Database Columns",
+        "inputs": {
+          "input_1": {
+            "label": "id"
+          },
+          "input_2": {
+            "label": "A"
+          },
+          "input_3": {
+            "label": "B"
+          },
+          "input_4": {
+            "label": "C"
+          },
+          "input_5": {
+            "label": "D"
+          },
+          "input_6": {
+            "label": "E"
+          }
+        },
+        "outputs": {}
+      }
+    },
+    "operator3": {
+      "top": 0,
+      "left": 0,
+      "properties": {
+        "title": "Default Values",
+        "inputs": {},
+        "outputs": {
+          "output_1": {
+            "label": "Auto Increment",
+            "type": "id"
+          },
+          "output_2": {
+            "label": "Time Stamp",
+            "type": "timestamp"
+          },
+          "output_3": {
+            "label": "Null",
+            "type": "null"
+          },
+          "output_4": {
+            "label": "0",
+            "type": "0"
+          }
+        }
+      }
+    }
+  },
+  "links": {
+    "0": {
+      "fromOperator": "operator1",
+      "fromConnector": "output_1",
+      "fromSubConnector": 0,
+      "toOperator": "operator2",
+      "toConnector": "input_2",
+      "toSubConnector": 0
+    },
+    "1": {
+      "fromOperator": "operator1",
+      "fromConnector": "output_2",
+      "fromSubConnector": 0,
+      "toOperator": "operator2",
+      "toConnector": "input_3",
+      "toSubConnector": 0
+    },
+    "2": {
+      "fromOperator": "operator1",
+      "fromConnector": "output_3",
+      "fromSubConnector": 0,
+      "toOperator": "operator2",
+      "toConnector": "input_4",
+      "toSubConnector": 0
+    },
+    "3": {
+      "fromOperator": "operator1",
+      "fromConnector": "output_4",
+      "fromSubConnector": 0,
+      "toOperator": "operator2",
+      "toConnector": "input_5",
+      "toSubConnector": 0
+    },
+    "4": {
+      "fromOperator": "operator3",
+      "fromConnector": "output_1",
+      "fromSubConnector": 0,
+      "toOperator": "operator2",
+      "toConnector": "input_1",
+      "toSubConnector": 0
+    },
+    "5": {
+      "fromOperator": "operator3",
+      "fromConnector": "output_2",
+      "fromSubConnector": 0,
+      "toOperator": "operator2",
+      "toConnector": "input_6",
+      "toSubConnector": 0
+    }
+  },
+  "operatorTypes": {}
+}
