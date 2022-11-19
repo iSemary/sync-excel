@@ -1,6 +1,10 @@
 <?php
 
 require './connect.php';
+require './spreadsheet-reader/php-excel-reader/excel_reader2.php';
+require('./spreadsheet-reader/SpreadsheetReader.php');
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Connect to database
@@ -34,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $flowJson = json_decode($_POST['flow_json'], true);
 
             /**
+             *  Array Examples
              * ['ai','timestamp','null', '0']
              * ['id','A', ...]
              * ['A1','B1', ...]
@@ -41,8 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $defaultsArr = [];
             $dbArr = [];
             $excelArr = [];
-
-
             /**
              * Associate data from json file into arrays 
              */
@@ -66,22 +69,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
             }
-
-
             /**
-             * ['excelCol' => 'dbCol', 'defaultCol' => 'dbCol']
+             * Example : ['Excel Column' => 'DB column', 'Default Column' => 'DB Column']
              */
-            $linkedArr = [];
+
 
             /**
              * Define the linked flow
              */
-            foreach ($flowJson['links'] as $key => $link) {
-                die(var_dump($link));
+            $linkedArr = [];
+            foreach ($flowJson['links'] as $link) {
+                $inputIndex  = substr($link['toConnector'], strpos($link['toConnector'], "_") + 1) - 1;
+                $outputIndex = substr($link['fromConnector'], strpos($link['fromConnector'], "_") + 1) - 1;
+
+                $linkedArr[] = [($link['fromOperator'] == 'operator3' ?  $defaultsArr[$outputIndex]  : $excelArr[$outputIndex]) => $dbArr[$inputIndex]];
             }
 
 
-             die(var_dump($linkedArr));
+            /**
+             * Upload excel file
+             */
+            $excelFile = $_FILES['excel_file'];
+            $excelFileName = $_FILES['excel_file']['name'];
+            $excelFileSize = $_FILES['excel_file']['size'];
+            $excelFileTmp = $_FILES['excel_file']['tmp_name'];
+            $excelFileType = $_FILES['excel_file']['type'];
+            // Custom name
+            $excelFile =  'SE' . '_' . rand(0, 1000000000) . $excelFileName;
+            // Move to temp folder
+            move_uploaded_file($excelFileTmp, "../temp/" . $excelFile);
+
+            // Read Excel file
+            $reader = new SpreadsheetReader("../temp/" . $excelFile);
+            foreach ($reader as $index => $row) {
+                if (isset($_POST['start_row']) && ($index + 1) < $_POST['start_row']) {
+                    return;
+                }
+                if (isset($_POST['end_row']) && ($index + 1) == $_POST['end_row']) {
+                    return;
+                }
+
+                
+                print_r($row);
+            }
+
+            /**
+             * Delete excel file after the process ends
+             */
+            if (is_file('../temp/' . $excelFile)) {
+                unlink('../temp/' . $excelFile);
+            }
+
+            // die(var_dump($linkedArr));
         }
 
 
