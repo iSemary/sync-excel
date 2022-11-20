@@ -100,7 +100,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             move_uploaded_file($excelFileTmp, "../temp/" . $excelFile);
 
             // Read Excel file
-            $reader = new SpreadsheetReader("../temp/" . $excelFile);
+            // $reader = new SpreadsheetReader("../temp/" . $excelFile);
+
+            $tables = $db->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" . $_POST['db_name'] . "' AND TABLE_NAME = '" . $_POST['db_table'] . "'");
+            
+
             foreach ($reader as $index => $row) {
                 if (isset($_POST['start_row']) && ($index + 1) < $_POST['start_row']) {
                     return;
@@ -109,8 +113,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     return;
                 }
 
-                
-                print_r($row);
+                /**
+                 * Insert into selected table 
+                 */
+
+                try {
+
+                    $statement = $db->prepare('INSERT INTO ' . $_POST['db_table'] . ' (A, B, C) VALUES (?, ?, ?)');
+                    $statement->execute([
+                        1,
+                        2,
+                        3
+                    ]);
+                } catch (Exception $e) {
+                    $response['message'] = $e;
+                    $response['success'] = false;
+                }
             }
 
             /**
@@ -120,7 +138,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 unlink('../temp/' . $excelFile);
             }
 
-            // die(var_dump($linkedArr));
+            if (($response['success'])) {
+                $response['message'] = 'Syncing done successfully.';
+                $response['success'] = true;
+            }
         }
 
 
