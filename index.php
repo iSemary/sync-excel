@@ -183,6 +183,12 @@
                                                 <input type="number" class="form-control" name="end_row" value="" placeholder="200">
                                             </div>
                                         </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="truncate_table" value="" id="truncateTable">
+                                            <label class="form-check-label" for="truncateTable">
+                                                <b class="text-danger">DELETE OLD DATA IN THE SELECTED TABLE</b> 
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tables = $db->query("SELECT table_name FROM information_schema.tables WHERE table_schema = '" . $_POST['db_name'] . "'");
             $tables = $tables->fetchAll(PDO::FETCH_ASSOC);
             if ($tables) {
-                $response['message'] = 'Available tables.';
+                $response['message'] = 'Tables added successfully.';
                 $response['data'] = $tables;
                 $response['success'] = true;
             } else {
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $tables = $db->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" . $_POST['db_name'] . "' AND TABLE_NAME = '" . $_POST['db_table'] . "'");
             $tables = $tables->fetchAll(PDO::FETCH_ASSOC);
             if ($tables) {
-                $response['message'] = 'Available columns.';
+                $response['message'] = 'Columns added successfully.';
                 $response['data'] = $tables;
                 $response['success'] = true;
             } else {
@@ -36,10 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         } elseif ($_POST['type'] == 'execute') {
             $flowJson = json_decode($_POST['flow_json'], true);
-
+            $error = false;
             /**
              *  Array Examples
-             * ['ai','timestamp','null', '0']
+             * ['id','timestamp','null', '0']
              * ['id','A', ...]
              * ['A1','B1', ...]
              */
@@ -69,20 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
             }
-            /**
-             * Example : ['Excel Column' => 'DB column', 'Default Column' => 'DB Column']
-             */
-
 
             /**
              * Define the linked flow
+             *
+             * 
+             * Example : ['Excel Column' => 'DB column', 'Default Column' => 'DB Column']
              */
+
             $linkedArr = [];
             foreach ($flowJson['links'] as $link) {
                 $inputIndex  = substr($link['toConnector'], strpos($link['toConnector'], "_") + 1) - 1;
                 $outputIndex = substr($link['fromConnector'], strpos($link['fromConnector'], "_") + 1) - 1;
 
-                $linkedArr[] = [($link['fromOperator'] == 'operator3' ?  $defaultsArr[$outputIndex]  : $excelArr[$outputIndex]) => $dbArr[$inputIndex]];
+                $linkedArr[($link['fromOperator'] == 'operator3' ?  $defaultsArr[$outputIndex]  : $excelArr[$outputIndex])] = $dbArr[$inputIndex];
             }
 
 
@@ -100,34 +100,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             move_uploaded_file($excelFileTmp, "../temp/" . $excelFile);
 
             // Read Excel file
-            // $reader = new SpreadsheetReader("../temp/" . $excelFile);
+            $reader = new SpreadsheetReader("../temp/" . $excelFile);
 
-            $tables = $db->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" . $_POST['db_name'] . "' AND TABLE_NAME = '" . $_POST['db_table'] . "'");
-            
+            $columns = $db->query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '" . $_POST['db_name'] . "' AND TABLE_NAME = '" . $_POST['db_table'] . "'");
 
+            $columnsCount = $columns->rowCount();
+
+            /**
+             * Generating a comma separated values for columns
+             */
+            $columns = $columns->fetchAll(PDO::FETCH_ASSOC);
+            $columns = array_column($columns, 'COLUMN_NAME');
+            $columns = json_encode($columns);
+            $columns = str_replace(['[', ']', '"'], ['(', ')', ''], $columns);
+
+            $columnsValues = '(';
+            for ($i = 0; $i < $columnsCount; $i++) {
+                $columnsValues .= '?' . ($i + 1 == $columnsCount ? ')' : ',');
+            }
+
+
+            /**
+             * Deletes all tables row if enabled
+             */
+            if (isset($_POST['truncate_table']) && $_POST['truncate_table'] == '1') {
+                $db->query("TRUNCATE " . $_POST['db_name'] . '.' . $_POST['db_table']);
+            }
+
+            /**
+             * Looping over each row in excel file
+             */
             foreach ($reader as $index => $row) {
-                if (isset($_POST['start_row']) && ($index + 1) < $_POST['start_row']) {
-                    return;
+                if (isset($_POST['start_row']) && !empty($_POST['start_row']) && ($index + 1) < $_POST['start_row']) {
+                    continue;
                 }
-                if (isset($_POST['end_row']) && ($index + 1) == $_POST['end_row']) {
-                    return;
+
+                if (isset($_POST['end_row']) && !empty($_POST['end_row']) && (($index) >= $_POST['end_row'])) {
+                    continue;
                 }
 
                 /**
-                 * Insert into selected table 
+                 * ==== Matching each column with it's value
                  */
+                $COLUMNS_FILL = [];
+                foreach ($dbArr as $i => $dbColumn) {
+                    $value = '';
+                    if (in_array(array_search($dbColumn, $linkedArr), $defaultsArr)) {
+                        switch ((array_search($dbColumn, $linkedArr))) {
+                            case 'ai':
+                                $value = 0;
+                                break;
+                            case 'null':
+                                $value = null;
+                                break;
+                            case 'timestamp':
+                                $value = time();
+                                break;
+                            default:
+                                $value = array_search($dbColumn, $linkedArr);
+                                break;
+                        }
+                    } else {
+                        $excelIndex = array_search(array_search($dbColumn, $linkedArr), $excelArr);
+                        $value = $row[$excelIndex];
+                    }
+
+                    $COLUMNS_FILL[] = $value;
+                }
+
 
                 try {
 
-                    $statement = $db->prepare('INSERT INTO ' . $_POST['db_table'] . ' (A, B, C) VALUES (?, ?, ?)');
-                    $statement->execute([
-                        1,
-                        2,
-                        3
-                    ]);
+                    /**
+                     * Insert statement with table name and comma separated columns, binding mark, values 
+                     */
+                    $statement = $db->prepare('INSERT INTO ' . $_POST['db_table'] . ' ' . $columns . ' VALUES ' . $columnsValues);
+                    $statement->execute($COLUMNS_FILL);
                 } catch (Exception $e) {
-                    $response['message'] = $e;
+                    $response['message'] = $e->getMessage();
                     $response['success'] = false;
+                    $response['data'] = [];
+                    $error = true;
                 }
             }
 
@@ -138,12 +191,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 unlink('../temp/' . $excelFile);
             }
 
-            if (($response['success'])) {
+            if (!$error) {
                 $response['message'] = 'Syncing done successfully.';
                 $response['success'] = true;
+                $response['data'] = [];
             }
         }
-
 
         echo json_encode($response);
     } else {

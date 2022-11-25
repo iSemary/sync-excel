@@ -12,7 +12,7 @@ $("#fillLocalhostDB").on("click", function (e) {
 function callAPI(formID, type, btn) {
   $("#connectType").val(type);
   let form = $("#" + formID);
-  let formBtn = $("#"+btn);
+  let formBtn = $("#" + btn);
   let formData = new FormData(form[0]);
   let formUrl = form.attr("action");
   $.ajax({
@@ -58,8 +58,12 @@ function callAPI(formID, type, btn) {
           $("#dbColumns").prop("disabled", true);
         }
       } else if (type == "execute") {
-
+        if (data.success) {
+        } else {
+          btn.prop("disabled", true);
+        }
       }
+
       $(".form-status").html(
         `<h6 class="text-${
           data.success ? "success" : "danger"
@@ -106,6 +110,13 @@ $("#get_data").on("click", function () {
   $("#matchTag").removeClass("close-tag").addClass("open-tag");
 });
 
+$("#truncateTable").change(function () {
+  if (this.checked) {
+    $(this).attr('value','1');
+  } else {
+    $(this).attr('value','0');
+  }
+});
 // Draw Flow based on database columns and excel columns
 function drawFlow(db_columns, excel_columns) {
   $(document).ready(function () {
@@ -404,7 +415,7 @@ function drawFlow(db_columns, excel_columns) {
           outputs: {
             output_1: {
               label: "Auto Increment",
-              type: "id",
+              type: "ai",
             },
             output_2: {
               label: "Time Stamp",
