@@ -61,7 +61,7 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="w-100 row">
                 <div class="col-md-6">
-                    <a class="navbar-brand" href="#">Abdelrhaman Samir (iSemary) </a><span><small class="text-muted">Code is a way to make life easier.</small></span>
+                    <a class="navbar-brand" href="#">Abdelrahman Samir (iSemary) </a><span><small class="text-muted">Code is a way to make life easier.</small></span>
                 </div>
                 <div class="col-md-6 text-right">
                     <div class="">
